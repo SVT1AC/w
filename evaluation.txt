@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cahier de labo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Baloo+2:wght@600..800&family=Patrick+Hand&display=swap">
+<style>
+/* Layout : une page de cahier à carreaux. Marge rouge, titres soulignés au stylo rouge,
+   dialogues en bulles écrites à la main, note encerclée en rouge à la fin. */
+:root{
+  --paper:#EEF4FB; --grid:#CBD9EE; --sheet:#FFFFFF; --scene:#EAF2FC;
+  --ink:#14264B; --ink-soft:#4F5F86; --line:#C3D2E8; --edge:#14264B;
+  --blue:#1B5FC9; --on-blue:#FFFFFF; --blue-tint:#DCE9FB;
+  --red:#D2362E; --hl:#FFE066;
+  --bubble-a:#DCEBFF; --bubble-b:#FFEBC7;
+  --ok:#1E7F4F; --bad:#C62828; --on-state:#FFFFFF;
+  --f-display:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  --f-hand:'Patrick Hand','Comic Sans MS','Segoe Print',cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1830; --grid:#1B2A4D; --sheet:#15234A; --scene:#101D3B;
+    --ink:#EAF0FF; --ink-soft:#A5B5DB; --line:#2B3E6B; --edge:#5C73A8;
+    --blue:#8DB6FF; --on-blue:#0E1830; --blue-tint:#1F3868;
+    --red:#FF8A80; --hl:#6B5A10;
+    --bubble-a:#1F3B6B; --bubble-b:#4A3A1C;
+    --ok:#6CC992; --bad:#FF8A80; --on-state:#0E1830;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1830; --grid:#1B2A4D; --sheet:#15234A; --scene:#101D3B;
+  --ink:#EAF0FF; --ink-soft:#A5B5DB; --line:#2B3E6B; --edge:#5C73A8;
+  --blue:#8DB6FF; --on-blue:#0E1830; --blue-tint:#1F3868;
+  --red:#FF8A80; --hl:#6B5A10;
+  --bubble-a:#1F3B6B; --bubble-b:#4A3A1C;
+  --ok:#6CC992; --bad:#FF8A80; --on-state:#0E1830;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink);
+  font-family:var(--f-body);font-size:17px;line-height:1.5;
+  padding-block:20px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:760px;margin:0 auto}
+p{margin:0}
+h1,h2{font-family:var(--f-display);margin:0;text-wrap:balance;color:var(--ink)}
+h1{font-weight:800;font-size:clamp(1.9rem,7vw,3rem);line-height:1.08}
+h2{font-weight:700;font-size:clamp(1.3rem,4.6vw,1.7rem);line-height:1.2}
+.pen{background:linear-gradient(var(--red),var(--red)) 0 100%/100% 3px no-repeat,linear-gradient(var(--red),var(--red)) 0 calc(100% - 6px)/100% 2px no-repeat;padding-bottom:8px}
+.eyebrow{font:700 .78rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.sheet{position:relative;background:var(--sheet);border:1.5px solid var(--edge);border-radius:6px;box-shadow:0 12px 24px -16px rgba(10,20,50,.45);padding:24px 18px 26px 38px}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:16px;width:2px;background:var(--red);opacity:.6}
+
+/* Accueil */
+.hero{display:grid;gap:14px}
+.facts{list-style:none;margin:20px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.facts li{border:1.5px solid var(--line);border-radius:6px;padding:6px 12px;font-weight:700;font-size:.9rem}
+.facts b{font:800 1.35rem var(--f-display);margin-right:6px;color:var(--blue)}
+.todo{margin:20px 0 0;padding-left:1.2rem;display:grid;gap:6px}
+.rail{display:flex;gap:8px;align-items:center;margin:22px 0 0;flex-wrap:wrap}
+.rail span{width:34px;height:34px;border-radius:50%;border:2px dashed var(--edge);display:grid;place-items:center;font:800 1.05rem var(--f-display);color:var(--ink-soft)}
+.rail em{font-style:normal;font-weight:700;margin-left:6px;color:var(--ink-soft)}
+.go{margin-top:24px}
+
+.btn{border:1.5px solid var(--edge);border-radius:6px;padding:11px 20px;background:var(--blue);color:var(--on-blue);font-weight:700;cursor:pointer;box-shadow:0 3px 0 var(--edge)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+.btn.ghost{background:var(--sheet);color:var(--ink)}
+.link{background:none;border:0;padding:4px 0;color:var(--blue);font-weight:700;text-decoration:underline;cursor:pointer}
+
+/* Dialogues */
+.scene{display:grid;gap:16px;background:var(--scene);border:1.5px solid var(--line);border-radius:10px;padding:16px 12px}
+.say{display:flex;gap:10px;align-items:flex-end;min-width:0}
+.say.b{flex-direction:row-reverse}
+.who{display:grid;justify-items:center;gap:0;flex:none;font-weight:700;font-size:.72rem;color:var(--ink-soft)}
+.av{width:54px;height:54px;display:block}
+.say.a .av{--avbg:var(--bubble-a)}
+.say.b .av{--avbg:var(--bubble-b)}
+.bub{background:var(--bubble-a);border:1.5px solid var(--edge);border-radius:16px 16px 16px 3px;padding:10px 14px;font:400 1.2rem/1.35 var(--f-hand);min-width:0;max-width:30rem}
+.say.b .bub{background:var(--bubble-b);border-radius:16px 16px 3px 16px}
+.bub ul{margin:4px 0 0;padding-left:1.1rem}
+.jars{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.jar{margin:0;display:grid;justify-items:center;gap:4px}
+.jar svg{width:112px;height:auto}
+.jar figcaption{font-weight:700;font-size:.85rem;background:var(--ink);color:var(--paper);padding:2px 10px;border-radius:4px}
+.tblwrap{overflow-x:auto}
+.tbl{border-collapse:collapse;width:100%;min-width:300px;background:var(--sheet);font-weight:700}
+.tbl th,.tbl td{border:1.5px solid var(--edge);padding:8px 10px;text-align:center}
+.tbl thead th{background:var(--blue);color:var(--on-blue)}
+.tbl tbody th{text-align:left;background:var(--blue-tint)}
+
+/* Questions */
+.phead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:14px}
+.tag{display:inline-block;background:var(--hl);color:#2A2406;font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;transform:rotate(-1.5deg)}
+.pts{font-weight:700;font-size:.85rem;color:var(--ink-soft)}
+.q{border:0;border-top:1px dashed var(--line);margin:0;padding:16px 0 4px;min-width:0}
+.q:first-of-type{margin-top:18px}
+.q legend{padding:0 0 10px;font-weight:700;display:flex;gap:10px;align-items:baseline}
+.qn{flex:none;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--ink);color:var(--paper);display:inline-grid;place-items:center;font:800 .95rem var(--f-display)}
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.kw{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+@media(max-width:560px){.opts.two{grid-template-columns:1fr}}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--sheet);position:relative;cursor:pointer;min-width:0}
+.opt input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.opt .mark{flex:none;width:20px;height:20px;border:2px solid var(--edge);border-radius:50%;margin-top:2px;display:grid;place-items:center}
+.opt:has(input:checked){border-color:var(--blue);background:var(--blue-tint)}
+.opt:has(input:checked) .mark{background:var(--blue);border-color:var(--blue)}
+.opt:has(input:checked) .mark::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--on-blue)}
+.opt:has(input:focus-visible){outline:3px solid var(--blue);outline-offset:2px}
+
+/* Mise en ordre */
+.consigne{margin:0 0 6px}
+.olist{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.ocard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1.5px solid var(--edge);border-radius:8px;background:var(--sheet)}
+.pos{width:2rem;height:2rem;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:800 1rem var(--f-display)}
+.otxt{font-weight:700;min-width:0}
+.octl{display:flex;gap:6px}
+.mv{width:44px;height:44px;border:1.5px solid var(--edge);border-radius:8px;background:var(--blue-tint);cursor:pointer;font-size:1rem;line-height:1}
+.mv:disabled{opacity:.35;cursor:default}
+.hint{margin-top:14px;color:var(--ink-soft);font-size:.95rem}
+
+/* Navigation */
+.topline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;font-weight:700;font-size:.85rem;color:var(--ink-soft);margin-bottom:10px}
+.tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;padding:0 6px;position:relative;z-index:2}
+.tab{border:1.5px solid var(--edge);border-bottom:0;border-radius:8px 8px 0 0;background:var(--scene);color:var(--ink-soft);padding:6px 2px 8px;display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:0;font-weight:700;font-size:.68rem;line-height:1.2}
+.tab b{font:800 1.1rem var(--f-display);color:inherit}
+.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab.done b::after{content:" ✓";color:var(--ok)}
+.tab[aria-current="step"]{background:var(--sheet);color:var(--ink);margin-bottom:-3px;padding-bottom:11px}
+@media(max-width:560px){.tab span{display:none}}
+.tabs + .sheet{z-index:1}
+.nav{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:20px}
+.warn{margin-top:16px;border:1.5px solid var(--bad);border-left-width:6px;border-radius:4px;padding:10px 14px;background:var(--sheet)}
+
+/* Résultat */
+.res-top{display:flex;flex-wrap:wrap;gap:22px 30px;align-items:center}
+.grade{position:relative;display:inline-grid;place-items:center;padding:16px 30px 12px;color:var(--red);font:400 4.3rem/1 var(--f-hand);transform:rotate(-4deg);flex:none;font-variant-numeric:tabular-nums}
+.grade::before{content:"";position:absolute;inset:0;border:3px solid var(--red);border-radius:52% 48% 50% 50%/46% 54% 48% 52%;transform:rotate(3deg)}
+@media(prefers-reduced-motion:no-preference){.grade{animation:pop .4s ease-out}@keyframes pop{from{transform:rotate(-4deg) scale(1.3)}to{transform:rotate(-4deg) scale(1)}}}
+.res-msg{display:grid;gap:6px;min-width:0;flex:1 1 220px}
+.mres{margin-top:20px;border-top:1.5px solid var(--edge)}
+.mres details{border-bottom:1px solid var(--line);padding:10px 0}
+.mres summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;font-weight:700}
+.mres summary span:last-child{font-variant-numeric:tabular-nums}
+.items{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.items li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px;border:1px solid var(--line);border-radius:6px}
+.badge{font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:4px;height:fit-content;background:var(--ok);color:var(--on-state)}
+.items .ko .badge{background:var(--bad)}
+.exp{color:var(--ink-soft);font-size:.95rem}
+.send{display:grid;gap:12px;margin-top:24px;padding-top:18px;border-top:1.5px solid var(--edge)}
+.fields{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+@media(max-width:520px){.fields{grid-template-columns:1fr}}
+.field{display:grid;gap:4px;min-width:0}
+.lbl{font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+input[type="text"]{font:inherit;color:inherit;width:100%;padding:10px 12px;border:1.5px solid var(--edge);border-radius:6px;background:var(--sheet);min-width:0}
+.report{width:100%;min-height:10rem;padding:12px;border:1.5px solid var(--edge);border-radius:6px;background:var(--sheet);color:var(--ink);font:400 .95rem/1.5 var(--f-body);resize:vertical}
+.copied{font-weight:700;color:var(--ok);min-height:1.5em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="intro">
+    <div class="sheet">
+      <p class="eyebrow">SVT · 1re année collège · Évaluation</p>
+      <h1 style="margin-top:10px"><span class="pen">La démarche d'investigation expérimentale</span></h1>
+      <p style="margin-top:18px">Salma et Adam veulent savoir de quoi une plante a besoin pour grandir. Ils mènent une expérience, étape par étape. Lis leurs discussions, puis réponds aux questions.</p>
+      <div class="scene" style="margin-top:20px" id="hero-scene"></div>
+      <ul class="facts">
+        <li><b>6</b>discussions</li>
+        <li><b>1</b>mise en ordre</li>
+        <li><b>20</b>points</li>
+        <li><b>15</b>minutes environ</li>
+      </ul>
+      <ol class="todo">
+        <li>Pour chaque discussion, trouve le mot clé, puis l'étape de la démarche qu'elle représente.</li>
+        <li>Réponds aussi aux petites questions sur ce que font Salma et Adam.</li>
+        <li>À la fin, remets les 6 étapes dans l'ordre.</li>
+        <li>Tu peux revenir en arrière. Ta note et la correction s'affichent à la fin.</li>
+      </ol>
+      <div class="rail" aria-label="Six étapes à retrouver"><span>?</span><span>?</span><span>?</span><span>?</span><span>?</span><span>?</span><em>6 étapes à retrouver</em></div>
+      <div class="go"><button type="button" class="btn" data-act="start">Commencer l'évaluation</button></div>
+    </div>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="topline"><span>Cahier de labo</span><span id="prog"></span></div>
+    <nav class="tabs" id="tabs" aria-label="Parties de l'évaluation"></nav>
+    <div class="sheet" id="stage"></div>
+    <p id="warn" class="warn" role="alert" hidden></p>
+    <div class="nav" id="nav"></div>
+  </section>
+
+  <section id="result" hidden></section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+var shuffle=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a};
+
+/* ---------- Contenu ---------- */
+var STEPS=[
+  {id:1,t:"Poser une question scientifique"},
+  {id:2,t:"Formuler une hypothèse"},
+  {id:3,t:"Élaborer un protocole expérimental"},
+  {id:4,t:"Mettre en œuvre le protocole expérimental"},
+  {id:5,t:"Présenter les résultats"},
+  {id:6,t:"Tirer une conclusion à partir des résultats"}
+];
+var stepName=function(id){return STEPS[id-1].t};
+var SPK={S:{name:"Salma",side:"a"},A:{name:"Adam",side:"b"}};
+
+var VA="Ajouter ou ne pas ajouter du CO₂";
+var VB="Observer s'il y a croissance ou non de la plante";
+var VC="Changer la taille des pots";
+
+var D=[
+ {n:1,step:1,kw:"Question",kwOpts:["Question","Hypothèse","Protocole expérimental","Conclusion"],
+  lines:[{w:"S",t:"Pour commencer, nous devons nous poser une question."},{w:"A",t:"De quoi la plante a besoin pour grandir ?"}],extra:[]},
+ {n:2,step:2,kw:"Hypothèse",kwOpts:["Hypothèse","Résultats","Protocole expérimental","Conclusion"],
+  lines:[{w:"A",t:"Nous commençons par vérifier si la plante a besoin de dioxyde de carbone pour grandir."},{w:"S",t:"Notre hypothèse est : si on ajoute du CO₂ à une plante, alors sa taille augmente."}],extra:[]},
+ {n:3,step:3,kw:"Variables",kwOpts:["Variables","Question","Résultats","Conclusion"],
+  lines:[{w:"A",t:"Nous devons d'abord déterminer la variable indépendante, celle qu'on doit faire varier dans l'expérience."},
+         {w:"S",t:"Ensuite, nous devons déterminer la variable dépendante, celle qu'on veut observer ou mesurer."},
+         {w:"S",t:"Nous devons aussi déterminer par quoi et comment faire varier la variable indépendante."},
+         {w:"A",t:"Oui. Et par quoi et comment observer la variable dépendante."}],
+  extra:[{id:"d3vi",q:"Ce qu'on doit faire varier (la variable indépendante) est :",opts:[VA,VB,VC],ok:VA},
+         {id:"d3vd",q:"Ce qu'on veut observer ou mesurer (la variable dépendante) est :",opts:[VA,VB,VC],ok:VB}]},
+ {n:4,step:4,kw:"Protocole expérimental",kwOpts:["Protocole expérimental","Question","Hypothèse","Conclusion"],media:"jars",
+  lines:[{w:"S",t:"Nous mettons en œuvre le protocole expérimental, étape par étape."},
+         {w:"A",t:"",ul:["On prend deux pots contenant deux plantes de même taille.","On ajoute du CO₂ dans l'un des deux pots."]}],extra:[]},
+ {n:5,step:5,kw:"Résultats",kwOpts:["Résultats","Question","Hypothèse","Variables"],media:"table",
+  lines:[{w:"S",t:"Voici les résultats de notre expérience."}],
+  extra:[{id:"d5t",q:"Avec du CO₂, que devient la taille de la plante ?",opts:["Elle augmente","Elle n'augmente pas","Elle diminue"],ok:"Elle augmente"}]},
+ {n:6,step:6,kw:"Conclusion",kwOpts:["Conclusion","Question","Variables","Protocole expérimental"],
+  lines:[{w:"S",t:"Est-ce que nos résultats obtenus sont les mêmes que les résultats attendus ?"},
+         {w:"A",t:"Oui, car en présence de CO₂ la taille de la plante augmente."},
+         {w:"S",t:"Notre hypothèse est donc confirmée."}],
+  extra:[{id:"d6w",q:"Pourquoi l'hypothèse est-elle confirmée ?",opts:["Car la taille de la plante augmente en présence de CO₂","Car la plante n'a pas besoin de CO₂ pour grandir","Car les deux plantes ont la même taille"],ok:"Car la taille de la plante augmente en présence de CO₂"}]}
+];
+var NSCREEN=7, ORDER_PTS=4;
+
+/* ---------- Dessins ---------- */
+function avatar(w){
+  var skin=w==="S"?"#E9B98F":"#D9A074",hair="#2B1B17";
+  var h=w==="S"?'<path d="M17 40 C12 14 52 12 47 40 L42 40 C43 29 40 22 32 22 C24 22 21 29 22 40 Z" fill="'+hair+'"/>'
+               :'<path d="M19.5 29 C19 13 45 13 44.5 29 C41 22 23 22 19.5 29 Z" fill="'+hair+'"/>';
+  return '<svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="var(--avbg)"/>'+
+    '<path d="M9 63 C9 51 20 47 32 47 C44 47 55 51 55 63 Z" fill="#ffffff" stroke="#14264B" stroke-width="1.6"/>'+
+    '<path d="M26 47.5 L32 57 L38 47.5" fill="none" stroke="#14264B" stroke-width="1.6" stroke-linejoin="round"/>'+
+    '<rect x="28.5" y="38" width="7" height="10" fill="'+skin+'"/><ellipse cx="32" cy="30" rx="11.5" ry="13" fill="'+skin+'"/>'+h+
+    '<circle cx="27.5" cy="31" r="1.5" fill="'+hair+'"/><circle cx="36.5" cy="31" r="1.5" fill="'+hair+'"/>'+
+    '<path d="M28.5 36.5 Q32 39.5 35.5 36.5" fill="none" stroke="'+hair+'" stroke-width="1.5" stroke-linecap="round"/></svg>'}
+function jar(label,co2){
+  var b=co2?'<g fill="none" stroke="var(--ink-soft)" stroke-width="1.4"><circle cx="30" cy="48" r="3"/><circle cx="88" cy="42" r="2.5"/><circle cx="36" cy="64" r="2.2"/><circle cx="84" cy="62" r="3"/><circle cx="60" cy="34" r="2"/></g><text x="22" y="36" font-size="10" font-weight="700" fill="var(--ink-soft)" font-family="Atkinson Hyperlegible,sans-serif">CO₂</text>':'';
+  return '<figure class="jar"><svg viewBox="0 0 120 124" role="img" aria-label="Pot sous cloche : '+esc(label)+'">'+
+    '<path d="M16 106 L16 58 C16 20 104 20 104 58 L104 106" fill="none" stroke="var(--ink-soft)" stroke-width="2.5"/>'+
+    '<ellipse cx="60" cy="108" rx="48" ry="7" fill="var(--line)"/>'+b+
+    '<path d="M60 76 C60 66 60 58 60 50" stroke="#2F8A55" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+    '<path d="M60 56 C48 56 44 48 46 42 C54 42 60 48 60 56Z" fill="#3BA06A"/><path d="M60 50 C72 50 78 42 75 35 C66 35 60 42 60 50Z" fill="#3BA06A"/>'+
+    '<path d="M43 80 L77 80 L72 106 L48 106 Z" fill="#C8643B"/><rect x="40" y="75" width="40" height="8" rx="2" fill="#B5532D"/></svg>'+
+    '<figcaption>'+esc(label)+'</figcaption></figure>'}
+function jarsHTML(){return '<div class="jars">'+jar("Avec CO₂",true)+jar("Sans CO₂",false)+'</div>'}
+function tableHTML(){return '<div class="tblwrap"><table class="tbl"><thead><tr><th scope="col">Ce qu\'on observe</th><th scope="col">Avec CO₂</th><th scope="col">Sans CO₂</th></tr></thead><tbody><tr><th scope="row">Taille de la plante</th><td>Augmente</td><td>N\'augmente pas</td></tr></tbody></table></div>'}
+function say(l){
+  var sp=SPK[l.w];
+  var ul=l.ul?'<ul>'+l.ul.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>':'';
+  return '<div class="say '+sp.side+'"><div class="who">'+avatar(l.w)+'<span>'+sp.name+'</span></div><div class="bub">'+(l.t?'<p>'+esc(l.t)+'</p>':'')+ul+'</div></div>'}
+
+/* ---------- État ---------- */
+var state;
+function isIdentity(a){return a.every(function(v,i){return v===i+1})}
+function init(){
+  var ord;do{ord=shuffle([1,2,3,4,5,6])}while(isIdentity(ord));
+  state={cur:0,warned:false,a:{},order:ord,ordTouched:false,opts:{},G:null};
+  D.forEach(function(d){
+    state.opts["d"+d.n+"k"]=shuffle(d.kwOpts).map(function(x){return {v:x,t:x}});
+    state.opts["d"+d.n+"s"]=shuffle(STEPS).map(function(s){return {v:String(s.id),t:s.t}});
+    d.extra.forEach(function(e){state.opts[e.id]=shuffle(e.opts).map(function(x){return {v:x,t:x}})});
+  });
+}
+function qids(d){var l=["d"+d.n+"k","d"+d.n+"s"];d.extra.forEach(function(e){l.push(e.id)});return l}
+function screenCount(i){
+  if(i<6){var d=D[i];return {done:qids(d).filter(function(q){return state.a[q]}).length,total:qids(d).length}}
+  return {done:state.ordTouched?1:0,total:1}}
+function orderHits(){if(!state.ordTouched)return 0;var k=0;state.order.forEach(function(id,i){if(id===i+1)k++});return k}
+function orderPts(){return Math.round(ORDER_PTS*orderHits()/6)}
+
+/* ---------- Rendu ---------- */
+function qRadio(id,num,text,cls){
+  var o=state.opts[id].map(function(x){
+    return '<label class="opt"><input type="radio" name="'+id+'" value="'+esc(x.v)+'" data-q="'+id+'"'+(state.a[id]===x.v?' checked':'')+'><span class="mark"></span><span>'+esc(x.t)+'</span></label>'}).join("");
+  return '<fieldset class="q"><legend><span class="qn">'+num+'</span><span>'+esc(text)+'</span></legend><div class="opts '+cls+'">'+o+'</div></fieldset>'}
+
+function rDisc(i){
+  var d=D[i],pts=qids(d).length;
+  var media=d.media==="jars"?jarsHTML():d.media==="table"?tableHTML():'';
+  var qs=qRadio("d"+d.n+"k",1,"Quel est le mot clé de cette discussion ?","kw")+
+         qRadio("d"+d.n+"s",2,"À quelle étape de la démarche correspond cette discussion ?","two");
+  d.extra.forEach(function(e,j){qs+=qRadio(e.id,3+j,e.q,"")});
+  return '<div class="phead"><span class="tag">Discussion '+d.n+' sur 6</span><span class="pts">'+pts+' point'+(pts>1?'s':'')+'</span></div>'+
+    '<div class="scene" role="group" aria-label="Discussion '+d.n+'">'+d.lines.map(say).join("")+media+'</div>'+qs}
+
+function rOrder(){
+  var li=state.order.map(function(id,pos){
+    var t=stepName(id);
+    return '<li class="ocard"><span class="pos">'+(pos+1)+'</span><span class="otxt">'+esc(t)+'</span><span class="octl">'+
+      '<button type="button" class="mv" data-act="mv" data-id="'+id+'" data-d="-1" aria-label="Monter : '+esc(t)+'"'+(pos===0?' disabled':'')+'>▲</button>'+
+      '<button type="button" class="mv" data-act="mv" data-id="'+id+'" data-d="1" aria-label="Descendre : '+esc(t)+'"'+(pos===5?' disabled':'')+'>▼</button></span></li>'}).join("");
+  return '<div class="phead"><span class="tag">Mise en ordre</span><span class="pts">'+ORDER_PTS+' points</span></div>'+
+    '<h2>Remets les 6 étapes dans l\'ordre</h2>'+
+    '<p class="consigne" style="margin-top:8px">Utilise les flèches pour placer les étapes de la démarche d\'investigation, de la première à la dernière.</p>'+
+    '<ol class="olist" aria-label="Étapes à ordonner">'+li+'</ol>'+
+    (state.ordTouched?'':'<p class="hint">Les étapes sont mélangées. Déplace-les pour les remettre en ordre.</p>')}
+
+function refreshChrome(){
+  var tot=0,done=0;
+  for(var i=0;i<NSCREEN;i++){var c=screenCount(i);tot+=c.total;done+=c.done}
+  $("#prog").textContent=done+" / "+tot+" réponses";
+  $("#tabs").innerHTML=Array.apply(null,Array(NSCREEN)).map(function(_,i){
+    var c=screenCount(i),dn=c.done===c.total;
+    return '<button type="button" class="tab'+(dn?' done':'')+'" data-act="goto" data-i="'+i+'"'+(i===state.cur?' aria-current="step"':'')+' aria-label="'+(i<6?'Discussion '+(i+1):'Mise en ordre')+(dn?', terminée':'')+'"><b>'+(i+1)+'</b><span>'+(i<6?'Discussion':'Ordre')+'</span></button>'}).join("")}
+function renderStage(){$("#stage").innerHTML=state.cur<6?rDisc(state.cur):rOrder()}
+function renderNav(){
+  var last=state.cur===NSCREEN-1,h="";
+  h+=state.cur>0?'<button type="button" class="btn ghost" data-act="prev">Précédent</button>':'<span></span>';
+  h+=last?'<button type="button" class="btn" data-act="finish">'+(state.warned?'Terminer quand même':'Terminer et voir ma note')+'</button>':'<button type="button" class="btn" data-act="next">Suivant</button>';
+  $("#nav").innerHTML=h}
+function renderQuiz(){refreshChrome();renderStage();renderNav();$("#warn").hidden=true}
+function go(i){state.cur=Math.max(0,Math.min(NSCREEN-1,i));state.warned=false;renderQuiz();window.scrollTo(0,0)}
+
+/* ---------- Notation ---------- */
+function grade(){
+  var secs=[];
+  D.forEach(function(d){
+    var items=[];
+    var gk=state.a["d"+d.n+"k"],gs=state.a["d"+d.n+"s"];
+    items.push({q:"Mot clé",ok:gk===d.kw,given:gk||"(pas de réponse)",exp:d.kw});
+    items.push({q:"Étape de la démarche",ok:gs===String(d.step),given:gs?stepName(+gs):"(pas de réponse)",exp:stepName(d.step)});
+    d.extra.forEach(function(e){var g=state.a[e.id];items.push({q:e.q,ok:g===e.ok,given:g||"(pas de réponse)",exp:e.ok})});
+    secs.push({title:"Discussion "+d.n,items:items,score:items.filter(function(x){return x.ok}).length,max:items.length});
+  });
+  var k=orderHits();
+  secs.push({title:"Mise en ordre des étapes",max:ORDER_PTS,score:orderPts(),
+    items:[{q:"Ordre des 6 étapes ("+k+" sur 6 bien placées)",ok:k===6,
+      given:state.ordTouched?state.order.map(function(id,i){return (i+1)+". "+stepName(id)}).join(" ; "):"(pas déplacé)",
+      exp:STEPS.map(function(s){return s.id+". "+s.t}).join(" ; ")}]});
+  var total=0;secs.forEach(function(s){total+=s.score});
+  return {secs:secs,total:total}}
+function verdict(n){
+  if(n>=18)return ["Excellent travail","Tu connais très bien les étapes de la démarche d'investigation."];
+  if(n>=14)return ["Très bien","Tu as compris l'essentiel. Regarde les réponses à revoir."];
+  if(n>=10)return ["Bien, continue","Tu as compris le principe. Relis la leçon sur les 6 étapes."];
+  return ["À revoir","Relis la leçon sur la démarche d'investigation, puis refais l'évaluation."]}
+function reportText(){
+  var n=($("#r-name")&&$("#r-name").value.trim())||"",c=($("#r-class")&&$("#r-class").value.trim())||"";
+  var L=["Cahier de labo · La démarche d'investigation expérimentale (SVT 1AC)","Élève : "+(n||"…")+(c?" · Classe : "+c:""),"Note : "+state.G.total+" / 20",""];
+  state.G.secs.forEach(function(s){L.push(s.title+" : "+s.score+" / "+s.max)});
+  return L.join("\n")}
+
+function showResult(){
+  var G=grade();state.G=G;var v=verdict(G.total);
+  var list=G.secs.map(function(s){
+    var li=s.items.map(function(x){
+      return '<li class="'+(x.ok?'ok':'ko')+'"><span class="badge">'+(x.ok?'Juste':'À revoir')+'</span><div><p>'+esc(x.q)+'</p>'+
+        (x.ok?'':'<p class="exp">Ta réponse : '+esc(x.given)+'</p><p class="exp">Réponse attendue : '+esc(x.exp)+'</p>')+'</div></li>'}).join("");
+    return '<details'+(s.score<s.max?' open':'')+'><summary><span>'+s.title+'</span><span>'+s.score+' / '+s.max+'</span></summary><ul class="items">'+li+'</ul></details>'}).join("");
+  $("#result").innerHTML='<div class="sheet"><div class="res-top"><div class="grade"><span>'+G.total+'/20</span></div>'+
+    '<div class="res-msg"><p class="eyebrow">Ta note</p><h2>'+v[0]+'</h2><p>'+v[1]+'</p></div></div>'+
+    '<div class="mres">'+list+'</div>'+
+    '<div class="send"><h2 style="font-size:1.25rem">Envoie ton compte rendu</h2><p>Écris ton nom et ta classe, puis copie le texte et envoie-le à ton enseignante.</p>'+
+    '<div class="fields"><div class="field"><label class="lbl" for="r-name">Prénom et nom</label><input type="text" id="r-name" maxlength="60" autocomplete="off"></div>'+
+    '<div class="field"><label class="lbl" for="r-class">Classe</label><input type="text" id="r-class" maxlength="20" autocomplete="off"></div></div>'+
+    '<label class="sr" for="report">Compte rendu</label><textarea id="report" class="report" readonly></textarea>'+
+    '<div><button type="button" class="btn" data-act="copy">Copier le compte rendu</button></div><p class="copied" id="copied" aria-live="polite"></p>'+
+    '<div><button type="button" class="btn ghost" data-act="restart">Refaire l\'évaluation</button></div></div></div>';
+  $("#report").value=reportText();
+  $("#intro").hidden=true;$("#quiz").hidden=true;$("#result").hidden=false;window.scrollTo(0,0)}
+
+/* ---------- Événements ---------- */
+document.addEventListener("change",function(e){
+  var t=e.target,q=t.dataset&&t.dataset.q;if(!q)return;
+  state.a[q]=t.value;state.warned=false;$("#warn").hidden=true;renderNav();refreshChrome()});
+document.addEventListener("input",function(e){
+  if(e.target.id==="r-name"||e.target.id==="r-class")$("#report").value=reportText()});
+
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]");if(!b)return;
+  var act=b.dataset.act;
+  if(act==="start"){$("#intro").hidden=true;$("#quiz").hidden=false;renderQuiz();window.scrollTo(0,0)}
+  else if(act==="goto")go(+b.dataset.i);
+  else if(act==="prev")go(state.cur-1);
+  else if(act==="next")go(state.cur+1);
+  else if(act==="mv"){
+    var id=+b.dataset.id,d=+b.dataset.d,idx=state.order.indexOf(id),j=idx+d;
+    if(j<0||j>5)return;
+    var t=state.order[idx];state.order[idx]=state.order[j];state.order[j]=t;
+    state.ordTouched=true;state.warned=false;$("#warn").hidden=true;
+    renderStage();refreshChrome();renderNav();
+    var nb=$('[data-act=mv][data-id="'+id+'"][data-d="'+d+'"]');
+    if(nb&&nb.disabled)nb=$('[data-act=mv][data-id="'+id+'"][data-d="'+(-d)+'"]');
+    if(nb)nb.focus({preventScroll:true})}
+  else if(act==="finish"){
+    var left=0;for(var i=0;i<NSCREEN;i++){var c=screenCount(i);left+=c.total-c.done}
+    if(left>0&&!state.warned){
+      state.warned=true;
+      var w=$("#warn");w.textContent="Il reste "+left+(left>1?" réponses vides":" réponse vide")+". Reviens les remplir, ou termine quand même.";w.hidden=false;
+      renderNav();return}
+    showResult()}
+  else if(act==="copy"){
+    var ta=$("#report"),msg=$("#copied");
+    var fb=function(){ta.focus();ta.select();msg.textContent="Sélectionne le texte et copie-le."};
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){msg.textContent="Compte rendu copié."},fb)}
+      else fb()
+    }catch(err){fb()}}
+  else if(act==="restart"){init();$("#result").hidden=true;$("#quiz").hidden=true;$("#intro").hidden=false;window.scrollTo(0,0)}
+});
+
+init();
+$("#hero-scene").innerHTML=say({w:"S",t:"Par où commence-t-on une expérience ?"})+say({w:"A",t:"Suis-nous, on va le découvrir !"});
+})();
+</script>
+</body>
+</html>
